@@ -72,6 +72,7 @@ export default function SubtitlePlayer({
   const [playbackRate, setPlaybackRate] = useState(1);
   const [showSettings, setShowSettings] = useState(false);
   const [isLooping, setIsLooping] = useState(false);
+  const [subtitlePosition, setSubtitlePosition] = useState<'bottom' | 'top'>('bottom');
   const [loopSegmentId, setLoopSegmentId] = useState<string | null>(null);
   const [subOffset, setSubOffset] = useState(0); // Offset in seconds
   const [isManualScrolling, setIsManualScrolling] = useState(false);
@@ -349,7 +350,9 @@ export default function SubtitlePlayer({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               className={`absolute left-0 right-0 px-10 md:px-20 flex flex-col items-center gap-1 md:gap-3 z-40 transition-all duration-300 pointer-events-none ${
-                showControls ? "bottom-36 md:bottom-48" : "bottom-12 md:bottom-24"
+                subtitlePosition === 'top' 
+                ? 'top-12 md:top-24' 
+                : (showControls ? "bottom-36 md:bottom-48" : "bottom-12 md:bottom-24")
               }`}
             >
               <div className="flex flex-wrap justify-center items-end gap-x-1 md:gap-x-2 pointer-events-auto max-w-full">
@@ -417,19 +420,19 @@ export default function SubtitlePlayer({
             />
           </div>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-x-2">
             {/* L: Playback */}
-            <div className="flex items-center gap-6">
-              <button onClick={togglePlay} className="text-white hover:text-orange-500 active:scale-95 transition-all">
-                {isPlaying ? <Pause size={32} className="md:w-10 md:h-10" fill="currentColor" /> : <Play size={32} className="md:w-10 md:h-10" fill="currentColor" />}
+            <div className="flex items-center gap-2 md:gap-4">
+              <button onClick={togglePlay} className="text-white hover:text-orange-500 active:scale-95 transition-all outline-none">
+                {isPlaying ? <Pause size={24} className="md:w-8 md:h-8" fill="currentColor" /> : <Play size={24} className="md:w-8 md:h-8" fill="currentColor" />}
               </button>
               
               <button 
                 onClick={() => setIsLooping(!isLooping)} 
-                className={`p-2 rounded-xl transition-all ${isLooping ? 'bg-orange-600 text-white shadow-lg' : 'text-zinc-500 hover:text-white bg-white/5'}`}
+                className={`p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all outline-none ${isLooping ? 'bg-orange-600 text-white shadow-lg' : 'text-zinc-500 hover:text-white bg-white/5'}`}
                 title="Loop current sentence (L)"
               >
-                <Repeat size={24} />
+                <Repeat size={18} className="md:w-5 md:h-5" />
               </button>
 
               <div className="flex items-center gap-3 md:gap-4 px-4 py-2 md:px-6 md:py-3 bg-white/5 border border-white/5 rounded-2xl text-xs md:text-lg font-black text-zinc-400">
@@ -445,20 +448,20 @@ export default function SubtitlePlayer({
             </div>
 
             {/* R: Level & Settings */}
-            <div className="flex items-center gap-4 md:gap-8">
-              <div className="flex bg-black/40 p-1 rounded-xl md:rounded-2xl border border-white/10">
+            <div className="flex items-center gap-1 md:gap-4">
+              <div className="flex bg-black/40 p-0.5 md:p-1 rounded-xl border border-white/10 shrink-0">
                  {['beginner', 'intermediate', 'advanced'].map(lvl => (
                    <button key={lvl} onClick={() => setMode(lvl as ViewMode)} 
-                           className={`px-4 py-2 md:px-6 md:py-2.5 rounded-lg md:rounded-xl text-[10px] md:text-sm font-black uppercase tracking-widest ${mode === lvl ? 'bg-orange-600 text-white shadow-xl' : 'text-zinc-600 hover:text-zinc-200'}`}>
-                     <span className="hidden sm:inline">{lvl}</span>
-                     <span className="sm:hidden">{lvl.charAt(0)}</span>
+                           className={`px-2 py-1 md:px-4 md:py-2 rounded-lg text-[9px] md:text-xs font-black uppercase tracking-widest ${mode === lvl ? 'bg-orange-600 text-white shadow-xl' : 'text-zinc-600 hover:text-zinc-200'}`}>
+                     <span className="hidden lg:inline">{lvl}</span>
+                     <span className="lg:hidden">{lvl.charAt(0)}</span>
                    </button>
                  ))}
               </div>
               
               <div className="relative">
-                <button onClick={() => setShowSettings(!showSettings)} className={`p-3 md:p-4 rounded-xl md:rounded-2xl border transition-all ${showSettings ? 'bg-orange-600 text-white shadow-xl' : 'bg-white/5 text-zinc-500 hover:text-white border-white/5'}`}>
-                  <Settings size={22} className={`md:w-6 md:h-6 ${showSettings ? 'animate-spin-slow' : ''}`} />
+                <button onClick={() => setShowSettings(!showSettings)} className={`p-2 md:p-3 rounded-lg md:rounded-xl border transition-all outline-none ${showSettings ? 'bg-orange-600 text-white shadow-xl' : 'bg-white/5 text-zinc-500 hover:text-white border-white/5'}`}>
+                  <Settings size={18} className={`md:w-5 md:h-5 ${showSettings ? 'animate-spin-slow' : ''}`} />
                 </button>
                 <AnimatePresence>
                   {showSettings && (
@@ -504,13 +507,29 @@ export default function SubtitlePlayer({
                           ))}
                         </div>
                       </div>
+
+                      <div className="flex flex-col gap-2 pt-2 border-t border-white/5">
+                        <p className="text-[10px] uppercase font-black text-zinc-600 text-center tracking-widest">Subtitle Position</p>
+                        <div className="flex gap-1 bg-white/5 p-1 rounded-xl">
+                          {(['bottom', 'top'] as const).map(pos => (
+                            <button 
+                              key={pos} 
+                              onClick={() => setSubtitlePosition(pos)}
+                              className={`flex-1 py-1.5 rounded-lg text-xs font-bold uppercase transition-all ${subtitlePosition === pos ? 'bg-orange-600 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-200'}`}
+                            >
+                              {pos}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              <button onClick={toggleFullscreen} className="hidden lg:block p-4 rounded-2xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all">
-                 {isFullscreen ? <Minimize size={24} /> : <Maximize size={24} />}
+              <button onClick={toggleFullscreen} className="flex p-2 md:p-3 rounded-lg md:rounded-xl bg-white/5 border border-white/5 text-zinc-500 hover:text-white transition-all outline-none">
+                 {isFullscreen ? <Minimize size={18} className="md:w-5 md:h-5" /> : <Maximize size={18} className="md:w-5 md:h-5" />}
               </button>
             </div>
           </div>
