@@ -1,0 +1,33 @@
+# Next.js
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python venv
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.env
+
+# Backend files
+uploads/
+*.log
+jobs.json
+debug_out.txt
+test_api_out.txt
+test_api_result.json
+previous_service.py.tmp
+
+# Experiments & Scaffolding
+scratch/
+test_llm.py
+test_translation.py
+
+# OS files
+.DS_Store
+Thumbs.db
+
